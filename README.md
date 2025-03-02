@@ -6,7 +6,7 @@ A physics-based orbital rocket game with 12 challenging levels and a star rating
 
 ## 🎮 Play Now
 
-[Play the game online](https://yourusername.github.io/planet-to-planet-rocket/) or download and run locally.
+[Play the game online](https://insideoutelephant.github.io/Planet-to-Planet-Rocket-Game/) or download and run locally.
 
 ## ✨ Features
 
