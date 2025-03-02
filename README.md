@@ -38,13 +38,13 @@ Launch your rocket from the blue planet and navigate it to the red planet. Use t
 
 ### Play Online
 
-Just visit [https://yourusername.github.io/planet-to-planet-rocket/](https://yourusername.github.io/planet-to-planet-rocket/)
+Just visit [https://insideoutelephant.github.io/planet-to-planet-rocket/](https://insideoutelephant.github.io/planet-to-planet-rocket/)
 
 ### Run Locally
 
 1. Clone this repository:
 ```bash
-git clone https://github.com/yourusername/planet-to-planet-rocket.git
+git clone https://github.com/insideoutelephant/planet-to-planet-rocket.git
 ```
 
 2. Navigate to the project directory:
@@ -136,7 +136,7 @@ MIT License - See LICENSE file for details.
 
 ## 📣 Feedback and Contributions
 
-Feedback, bug reports, and pull requests are welcome! Feel free to check the [issues page](https://github.com/yourusername/planet-to-planet-rocket/issues).
+Feedback, bug reports, and pull requests are welcome! Feel free to check the [issues page](https://github.com/insideoutelephant/planet-to-planet-rocket/issues).
 
 ---
 
