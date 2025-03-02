@@ -60,6 +60,19 @@ function showLevelEditor(resetToDefaults = true) {
         editorContainer.className = 'editor-container';
         editorScreen.appendChild(editorContainer);
         
+        // Create preview canvas and controls
+        const previewContainer = document.createElement('div');
+        previewContainer.className = 'preview-container';
+        editorContainer.appendChild(previewContainer);
+        
+        // Create preview canvas
+        const previewCanvas = document.createElement('canvas');
+        previewCanvas.id = 'previewCanvas';
+        previewCanvas.width = 300;
+        previewCanvas.height = 300;
+        previewCanvas.className = 'preview-canvas';
+        previewContainer.appendChild(previewCanvas);
+        
         // Create form for level parameters
         const form = document.createElement('form');
         form.className = 'editor-form';
@@ -89,21 +102,25 @@ function showLevelEditor(resetToDefaults = true) {
         createInputGroup(planet1Section, 'range', 'planet1Distance', 'Distance from Sun:', 120, (value) => {
             editingLevel.planet1.distance = parseInt(value);
             document.getElementById('planet1Distance-value').textContent = value;
+            updateOrbitPreview();
         }, 80, 200, 5);
         
         createInputGroup(planet1Section, 'range', 'planet1StartAngle', 'Start Angle (0-360°):', 0, (value) => {
             editingLevel.planet1.startAngle = (parseInt(value) * Math.PI) / 180;
             document.getElementById('planet1StartAngle-value').textContent = value + '°';
+            updateOrbitPreview();
         }, 0, 360, 15);
         
         createInputGroup(planet1Section, 'range', 'planet1OrbitSpeed', 'Orbit Speed:', 0.6, (value) => {
             editingLevel.planet1.orbitSpeed = parseFloat(value);
             document.getElementById('planet1OrbitSpeed-value').textContent = value;
+            updateOrbitPreview();
         }, -1.5, 1.5, 0.1);
         
         createInputGroup(planet1Section, 'range', 'planet1Radius', 'Planet Size:', 15, (value) => {
             editingLevel.planet1.radius = parseInt(value);
             document.getElementById('planet1Radius-value').textContent = value;
+            updateOrbitPreview();
         }, 8, 25, 1);
         
         // Create planet 2 section
@@ -118,21 +135,25 @@ function showLevelEditor(resetToDefaults = true) {
         createInputGroup(planet2Section, 'range', 'planet2Distance', 'Distance from Sun:', 240, (value) => {
             editingLevel.planet2.distance = parseInt(value);
             document.getElementById('planet2Distance-value').textContent = value;
+            updateOrbitPreview();
         }, 180, 340, 5);
         
         createInputGroup(planet2Section, 'range', 'planet2StartAngle', 'Start Angle (0-360°):', 180, (value) => {
             editingLevel.planet2.startAngle = (parseInt(value) * Math.PI) / 180;
             document.getElementById('planet2StartAngle-value').textContent = value + '°';
+            updateOrbitPreview();
         }, 0, 360, 15);
         
         createInputGroup(planet2Section, 'range', 'planet2OrbitSpeed', 'Orbit Speed:', 0.3, (value) => {
             editingLevel.planet2.orbitSpeed = parseFloat(value);
             document.getElementById('planet2OrbitSpeed-value').textContent = value;
+            updateOrbitPreview();
         }, -1.5, 1.5, 0.1);
         
         createInputGroup(planet2Section, 'range', 'planet2Radius', 'Planet Size:', 20, (value) => {
             editingLevel.planet2.radius = parseInt(value);
             document.getElementById('planet2Radius-value').textContent = value;
+            updateOrbitPreview();
         }, 8, 25, 1);
         
         // Create buttons container
@@ -196,6 +217,9 @@ function showLevelEditor(resetToDefaults = true) {
     
     // Pause the game if it's running
     pauseGame();
+    
+    // Update the preview
+    updateOrbitPreview();
 }
 
 /**
@@ -295,6 +319,9 @@ function resetEditorToDefault() {
     
     // Update the UI if it exists
     updateEditorInputs();
+    
+    // Update the preview
+    updateOrbitPreview();
 }
 
 /**
@@ -461,6 +488,116 @@ function handleLevelCompleteForEditor(stars) {
 }
 
 /**
+ * Update the orbit preview based on current editor settings
+ */
+function updateOrbitPreview() {
+    const canvas = document.getElementById('previewCanvas');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    
+    // Scale factor to fit orbits into the preview canvas
+    const maxOrbitDistance = Math.max(editingLevel.planet1.distance, editingLevel.planet2.distance);
+    const scaleFactor = (Math.min(width, height) * 0.4) / maxOrbitDistance;
+    
+    // Clear canvas
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, width, height);
+    
+    // Draw sun
+    const sunRadius = 10;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, sunRadius, 0, Math.PI * 2);
+    ctx.fillStyle = '#FDB813';
+    ctx.fill();
+    
+    // Draw orbit paths
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, editingLevel.planet1.distance * scaleFactor, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, editingLevel.planet2.distance * scaleFactor, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.stroke();
+    
+    // Calculate planet positions
+    const p1X = centerX + Math.cos(editingLevel.planet1.startAngle) * (editingLevel.planet1.distance * scaleFactor);
+    const p1Y = centerY + Math.sin(editingLevel.planet1.startAngle) * (editingLevel.planet1.distance * scaleFactor);
+    
+    const p2X = centerX + Math.cos(editingLevel.planet2.startAngle) * (editingLevel.planet2.distance * scaleFactor);
+    const p2Y = centerY + Math.sin(editingLevel.planet2.startAngle) * (editingLevel.planet2.distance * scaleFactor);
+    
+    // Draw planet 1 (blue)
+    const p1Radius = Math.max(5, editingLevel.planet1.radius * scaleFactor * 0.5);
+    ctx.beginPath();
+    ctx.arc(p1X, p1Y, p1Radius, 0, Math.PI * 2);
+    ctx.fillStyle = '#3498db';
+    ctx.fill();
+    
+    // Label for planet 1
+    ctx.font = '10px Arial';
+    ctx.fillStyle = 'white';
+    ctx.textAlign = 'center';
+    ctx.fillText('P1', p1X, p1Y - p1Radius - 5);
+    
+    // Draw planet 2 (red)
+    const p2Radius = Math.max(5, editingLevel.planet2.radius * scaleFactor * 0.5);
+    ctx.beginPath();
+    ctx.arc(p2X, p2Y, p2Radius, 0, Math.PI * 2);
+    ctx.fillStyle = '#e74c3c';
+    ctx.fill();
+    
+    // Label for planet 2
+    ctx.font = '10px Arial';
+    ctx.fillStyle = 'white';
+    ctx.textAlign = 'center';
+    ctx.fillText('P2', p2X, p2Y - p2Radius - 5);
+    
+    // Draw angle indicators
+    drawAngleIndicator(ctx, centerX, centerY, editingLevel.planet1.startAngle, editingLevel.planet1.distance * scaleFactor * 0.7, '#3498db');
+    drawAngleIndicator(ctx, centerX, centerY, editingLevel.planet2.startAngle, editingLevel.planet2.distance * scaleFactor * 0.7, '#e74c3c');
+}
+
+/**
+ * Draw an angle indicator
+ */
+function drawAngleIndicator(ctx, centerX, centerY, angle, length, color) {
+    const endX = centerX + Math.cos(angle) * length;
+    const endY = centerY + Math.sin(angle) * length;
+    
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.lineTo(endX, endY);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    
+    // Draw angle arc
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, 15, 0, angle, angle > 0);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    
+    // Convert angle to degrees for display
+    const degrees = Math.round((angle * 180) / Math.PI);
+    
+    // Draw angle text
+    ctx.font = '10px Arial';
+    ctx.fillStyle = color;
+    ctx.textAlign = 'center';
+    const textX = centerX + Math.cos(angle / 2) * 25;
+    const textY = centerY + Math.sin(angle / 2) * 25;
+    ctx.fillText(degrees + '°', textX, textY);
+}
+
+/**
  * Save the current level settings to a JSON file
  */
 function saveLevelToFile() {
@@ -547,6 +684,9 @@ function loadLevelFromFile() {
                 
                 // Update the UI
                 updateEditorInputs();
+                
+                // Update the preview
+                updateOrbitPreview();
                 
                 showNotification('Level loaded successfully!');
             } catch (error) {
