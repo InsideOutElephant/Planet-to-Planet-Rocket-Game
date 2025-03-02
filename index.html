@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planet to Planet Rocket Game</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div id="startScreen">
+        <h1>Planet to Planet Rocket Game</h1>
+        <p>Launch your rocket from the blue planet and hit the red planet. Complete levels to unlock more challenges!</p>
+        <ul style="text-align: left; margin-bottom: 20px; list-style-type: none; padding: 0;">
+            <li>⚡ Use the slider to set your launch speed</li>
+            <li>🚀 Click "Launch Rocket" or press SPACE to launch</li>
+            <li>🔥 Use the SPACE key again or click the button for extra thrust</li>
+            <li>⟲ Press R key to retry the level</li>
+        </ul>
+        <div style="display: flex; gap: 15px;">
+            <button id="startButton">Start Level 1</button>
+            <button id="levelSelectButton">Level Select</button>
+        </div>
+    </div>
+    
+    <div class="level-indicator" id="levelIndicator"></div>
+    
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <div class="controls">
+        <div>
+            <label for="speedInput">Rocket Speed: <span id="speedValue">50</span></label>
+            <input type="range" id="speedInput" min="10" max="120" value="50">
+        </div>
+        <button id="actionBtn">Launch Rocket</button>
+        <button id="resetBtn">Retry Level</button>
+    </div>
+    <div class="game-info">
+        <div>Time: <span id="timer">0.0</span>s</div>
+        <div class="status" id="gameStatus"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/utils.js"></script>
+    <script src="js/levels.js"></script>
+    <script src="js/level-select.js"></script>
+    <script type="module" src="js/vr-math.js"></script>
+    <script type="module" src="js/vr-shaders.js"></script>
+    <script type="module" src="js/vr-models.js"></script>
+    <script type="module" src="js/webxr.js"></script>
+    <script src="js/entities.js"></script>
+    <script src="js/renderer.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
