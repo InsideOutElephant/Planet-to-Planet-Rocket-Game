@@ -25,6 +25,13 @@ canvas {
     align-items: center;
     justify-content: center;
     gap: 15px;
+    flex-wrap: wrap;
+}
+
+.angle-control {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 input[type="range"] {
@@ -55,6 +62,13 @@ button:disabled {
 .game-info {
     margin-top: 10px;
     text-align: center;
+}
+
+.rotation-instructions {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #f1c40f;
+    animation: pulse 2s infinite;
 }
 
 .status {
@@ -549,4 +563,95 @@ button:disabled {
 
 .fade-out {
     opacity: 0;
+}
+
+/* Asteroid list container styling */
+.asteroid-list-container {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+    padding-right: 10px;
+}
+
+/* Asteroid item styling */
+.asteroid-item {
+    background-color: rgba(30, 30, 30, 0.7);
+    border: 1px solid #f39c12;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.asteroid-item .input-group {
+    margin-bottom: 10px;
+}
+
+.remove-asteroid-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 2px 6px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.remove-asteroid-btn:hover {
+    background-color: #c0392b;
+}
+
+/* Color picker styling */
+input[type="color"] {
+    width: 50px;
+    height: 25px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background: none;
+}
+
+/* Rotation controls styling */
+.rotation-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 10px;
+}
+
+.rotation-controls button {
+    padding: 5px 10px;
+    font-size: 18px;
+    background-color: #3498db;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+}
+
+.rotation-controls button:hover {
+    background-color: #2980b9;
+}
+
+.rotation-controls button:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.boost-error {
+    animation: shake 0.3s;
+    border-color: #f44336 !important;
+    background-color: #e74c3c !important;
 }

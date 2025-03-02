@@ -21,7 +21,8 @@ const levels = [
         },
         timeLimit: 7,
         icon: "🚀",
-        description: "Launch your rocket from the blue planet to the red planet. Mind the gravity!"
+        description: "Launch your rocket from the blue planet to the red planet. Mind the gravity!",
+        asteroids: [] // No asteroids in level 1
     },
     
     // Level 2 - Faster orbit
@@ -42,10 +43,11 @@ const levels = [
         },
         timeLimit: 6.5, // Slightly less time
         icon: "⚡",
-        description: "The planets are moving faster now. Time your launch carefully!"
+        description: "The planets are moving faster now. Time your launch carefully!",
+        asteroids: [] // No asteroids in level 2
     },
     
-    // Level 3 - Closer orbits
+    // Level 3 - Closer orbits with one asteroid
     {
         id: 3,
         name: "Narrow Gap",
@@ -63,10 +65,19 @@ const levels = [
         },
         timeLimit: 6,
         icon: "🔍",
-        description: "The gap between planets has narrowed. Navigate carefully!"
+        description: "The gap between planets has narrowed. Watch out for the asteroid!",
+        asteroids: [
+            {
+                distance: 160,
+                startAngle: Math.PI * 1.25,
+                orbitSpeed: 0.45,
+                radius: 8,
+                color: "#8B5A00"
+            }
+        ]
     },
     
-    // Level 4 - Orthogonal orbits
+    // Level 4 - Orthogonal orbits with two asteroids
     {
         id: 4,
         name: "Crossing Paths",
@@ -84,7 +95,23 @@ const levels = [
         },
         timeLimit: 6,
         icon: "✂️",
-        description: "The planets are moving in perpendicular positions. Watch their crossing paths!"
+        description: "The planets are moving in perpendicular positions. Navigate between asteroids!",
+        asteroids: [
+            {
+                distance: 170,
+                startAngle: Math.PI / 3,
+                orbitSpeed: 0.4,
+                radius: 7,
+                color: "#9E9E9E"
+            },
+            {
+                distance: 200,
+                startAngle: Math.PI * 1.2,
+                orbitSpeed: -0.3,
+                radius: 9,
+                color: "#A0522D"
+            }
+        ]
     },
     
     // Level 5 - Fast inner planet, slow outer planet
@@ -105,7 +132,23 @@ const levels = [
         },
         timeLimit: 5.5,
         icon: "⏱️",
-        description: "Your starting planet is orbiting much faster than the target. Challenging trajectory!"
+        description: "Your starting planet is orbiting much faster than the target. Challenging trajectory!",
+        asteroids: [
+            {
+                distance: 180,
+                startAngle: 0,
+                orbitSpeed: 0.5,
+                radius: 8,
+                color: "#8B4513"
+            },
+            {
+                distance: 220,
+                startAngle: Math.PI,
+                orbitSpeed: 0.4,
+                radius: 10,
+                color: "#696969"
+            }
+        ]
     },
     
     // Level 6 - Faster outer planet, inner planet slower
@@ -126,10 +169,26 @@ const levels = [
         },
         timeLimit: 5.5,
         icon: "🏁",
-        description: "The target planet is moving much faster than yours. Can you catch up?"
+        description: "The target planet is moving much faster than yours. Can you catch up?",
+        asteroids: [
+            {
+                distance: 200,
+                startAngle: Math.PI / 2,
+                orbitSpeed: -0.3,
+                radius: 9,
+                color: "#8B5A00"
+            },
+            {
+                distance: 240,
+                startAngle: Math.PI * 1.5,
+                orbitSpeed: 0.5,
+                radius: 7,
+                color: "#9E9E9E"
+            }
+        ]
     },
     
-    // Level 7 - Reversed orbits
+    // Level 7 - Reversed orbits with asteroid belt
     {
         id: 7,
         name: "Orbital Collision",
@@ -147,7 +206,44 @@ const levels = [
         },
         timeLimit: 5,
         icon: "💥",
-        description: "The planets are orbiting in opposite directions. Intercept course required!"
+        description: "The planets are orbiting in opposite directions. Navigate through the asteroid belt!",
+        asteroids: [
+            {
+                distance: 180,
+                startAngle: 0,
+                orbitSpeed: 0.4,
+                radius: 8,
+                color: "#8B5A00"
+            },
+            {
+                distance: 195,
+                startAngle: Math.PI / 3,
+                orbitSpeed: -0.2,
+                radius: 7,
+                color: "#9E9E9E"
+            },
+            {
+                distance: 210,
+                startAngle: Math.PI * 2 / 3,
+                orbitSpeed: 0.3,
+                radius: 9,
+                color: "#A0522D"
+            },
+            {
+                distance: 225,
+                startAngle: Math.PI,
+                orbitSpeed: -0.3,
+                radius: 6,
+                color: "#696969"
+            },
+            {
+                distance: 240,
+                startAngle: Math.PI * 4 / 3,
+                orbitSpeed: 0.2,
+                radius: 8,
+                color: "#8B4513"
+            }
+        ]
     },
     
     // Level 8 - Very fast both planets
@@ -168,10 +264,33 @@ const levels = [
         },
         timeLimit: 5,
         icon: "⚡",
-        description: "Both planets are in rapid orbit. You'll need precise timing!"
+        description: "Both planets are in rapid orbit. You'll need precise timing!",
+        asteroids: [
+            {
+                distance: 200,
+                startAngle: 0,
+                orbitSpeed: 0.5,
+                radius: 10,
+                color: "#8B4513"
+            },
+            {
+                distance: 230,
+                startAngle: Math.PI,
+                orbitSpeed: -0.6,
+                radius: 8,
+                color: "#A0522D"
+            },
+            {
+                distance: 260,
+                startAngle: Math.PI / 2,
+                orbitSpeed: 0.7,
+                radius: 7,
+                color: "#9E9E9E"
+            }
+        ]
     },
     
-    // Level 9 - Far distance
+    // Level 9 - Far distance with moving obstacles
     {
         id: 9,
         name: "Long Shot",
@@ -189,10 +308,40 @@ const levels = [
         },
         timeLimit: 7, // More time for the distance
         icon: "🎯",
-        description: "The target planet is far away. Use the sun's gravity to slingshot your rocket!"
+        description: "The target planet is far away. Use the sun's gravity and avoid asteroids!",
+        asteroids: [
+            {
+                distance: 180,
+                startAngle: Math.PI / 3,
+                orbitSpeed: 0.4,
+                radius: 8,
+                color: "#8B5A00"
+            },
+            {
+                distance: 220,
+                startAngle: Math.PI * 2 / 3,
+                orbitSpeed: -0.3,
+                radius: 9,
+                color: "#A0522D"
+            },
+            {
+                distance: 260,
+                startAngle: Math.PI,
+                orbitSpeed: 0.5,
+                radius: 10,
+                color: "#8B4513"
+            },
+            {
+                distance: 300,
+                startAngle: Math.PI * 4 / 3,
+                orbitSpeed: -0.4,
+                radius: 7,
+                color: "#9E9E9E"
+            }
+        ]
     },
     
-    // Level 10 - The ultimate challenge
+    // Level 10 - The ultimate challenge with more obstacles
     {
         id: 10,
         name: "Master Pilot",
@@ -210,10 +359,61 @@ const levels = [
         },
         timeLimit: 4.5, // Very little time
         icon: "👨‍✈️",
-        description: "The ultimate test of your piloting skills. Good luck!"
+        description: "The ultimate test of your piloting skills. Avoid the asteroid field!",
+        asteroids: [
+            {
+                distance: 170,
+                startAngle: 0,
+                orbitSpeed: 0.6,
+                radius: 9,
+                color: "#8B5A00"
+            },
+            {
+                distance: 190,
+                startAngle: Math.PI / 2,
+                orbitSpeed: -0.4,
+                radius: 7,
+                color: "#9E9E9E"
+            },
+            {
+                distance: 210,
+                startAngle: Math.PI,
+                orbitSpeed: 0.5,
+                radius: 8,
+                color: "#A0522D"
+            },
+            {
+                distance: 230,
+                startAngle: Math.PI * 3 / 2,
+                orbitSpeed: -0.5,
+                radius: 10,
+                color: "#696969"
+            },
+            {
+                distance: 250,
+                startAngle: 0,
+                orbitSpeed: 0.4,
+                radius: 9,
+                color: "#8B4513"
+            },
+            {
+                distance: 270,
+                startAngle: Math.PI / 2,
+                orbitSpeed: -0.3,
+                radius: 7,
+                color: "#8B5A00"
+            },
+            {
+                distance: 290,
+                startAngle: Math.PI,
+                orbitSpeed: 0.3,
+                radius: 8,
+                color: "#9E9E9E"
+            }
+        ]
     },
     
-    // Level 11 - Tiny target
+    // Level 11 - Tiny target with obstacles
     {
         id: 11,
         name: "Needle Thread",
@@ -231,10 +431,40 @@ const levels = [
         },
         timeLimit: 6,
         icon: "🧵",
-        description: "The target planet is smaller and harder to hit. Precision is key!"
+        description: "The target planet is smaller and harder to hit. Thread your way through!",
+        asteroids: [
+            {
+                distance: 190,
+                startAngle: 0,
+                orbitSpeed: 0.5,
+                radius: 8,
+                color: "#8B5A00"
+            },
+            {
+                distance: 220,
+                startAngle: Math.PI / 3,
+                orbitSpeed: -0.4,
+                radius: 7,
+                color: "#9E9E9E"
+            },
+            {
+                distance: 240,
+                startAngle: Math.PI * 2 / 3,
+                orbitSpeed: 0.3,
+                radius: 10,
+                color: "#A0522D"
+            },
+            {
+                distance: 260,
+                startAngle: Math.PI,
+                orbitSpeed: -0.3,
+                radius: 9,
+                color: "#696969"
+            }
+        ]
     },
     
-    // Level 12 - Dual challenge
+    // Level 12 - Dual challenge with dense asteroid field
     {
         id: 12,
         name: "Cosmic Dance",
@@ -251,8 +481,80 @@ const levels = [
             radius: 20
         },
         timeLimit: 4, // Very tight time limit
-        icon: "💃",
-        description: "The planets start aligned but move in opposite directions. Perfect timing required!"
+        icon: "💫",
+        description: "Navigate through the dense asteroid field to reach the target planet!",
+        asteroids: [
+            {
+                distance: 190,
+                startAngle: Math.PI / 6,
+                orbitSpeed: 0.5,
+                radius: 8,
+                color: "#8B4513"
+            },
+            {
+                distance: 200,
+                startAngle: Math.PI / 3,
+                orbitSpeed: -0.3,
+                radius: 7,
+                color: "#9E9E9E"
+            },
+            {
+                distance: 210,
+                startAngle: Math.PI / 2,
+                orbitSpeed: 0.4,
+                radius: 9,
+                color: "#A0522D"
+            },
+            {
+                distance: 220,
+                startAngle: Math.PI * 2 / 3,
+                orbitSpeed: -0.4,
+                radius: 7,
+                color: "#8B5A00"
+            },
+            {
+                distance: 230,
+                startAngle: Math.PI * 5 / 6,
+                orbitSpeed: 0.3,
+                radius: 8,
+                color: "#696969"
+            },
+            {
+                distance: 240,
+                startAngle: Math.PI,
+                orbitSpeed: -0.5,
+                radius: 10,
+                color: "#8B4513"
+            },
+            {
+                distance: 250,
+                startAngle: Math.PI * 7 / 6,
+                orbitSpeed: 0.4,
+                radius: 6,
+                color: "#9E9E9E"
+            },
+            {
+                distance: 260,
+                startAngle: Math.PI * 4 / 3,
+                orbitSpeed: -0.3,
+                radius: 9,
+                color: "#A0522D"
+            },
+            {
+                distance: 270,
+                startAngle: Math.PI * 3 / 2,
+                orbitSpeed: 0.35,
+                radius: 7,
+                color: "#8B5A00"
+            },
+            {
+                distance: 280,
+                startAngle: Math.PI * 5 / 3,
+                orbitSpeed: -0.45,
+                radius: 8,
+                color: "#696969"
+            }
+        ]
     }
 ];
 

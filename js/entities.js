@@ -19,6 +19,7 @@ let planet1;
 let planet2;
 let rocket;
 let stars = [];
+let asteroids = []; // Array to hold asteroid objects
 
 // Game state variables
 let currentState = GAME_STATE.INTRO;
@@ -77,6 +78,8 @@ function initEntities(canvasElement) {
         radius: 6,
         speed: 50, // Initial speed
         angle: 0,
+        rocketAngle: 0, // Angle of the rocket itself (for rendering)
+        orbitAngle: 0, // Angle around planet1 (for positioning before launch)
         velX: 0,
         velY: 0,
         active: false,
@@ -86,6 +89,9 @@ function initEntities(canvasElement) {
         fuel: 100,
         boosting: false
     };
+    
+    // Initialize asteroids array
+    asteroids = [];
     
     // Generate background stars
     stars = generateStars(100, canvas.width, canvas.height);
@@ -111,6 +117,25 @@ function loadLevelConfig(levelConfig) {
     // Set time limit
     maxGameTime = levelConfig.timeLimit;
     
+    // Reset rocket orbit angle
+    rocket.orbitAngle = Math.PI/2; // Start with perpendicular launch
+    
+    // Load asteroids if present in level config
+    asteroids = [];
+    if (levelConfig.asteroids && Array.isArray(levelConfig.asteroids)) {
+        levelConfig.asteroids.forEach(asteroidConfig => {
+            asteroids.push({
+                distance: asteroidConfig.distance,
+                angle: asteroidConfig.startAngle,
+                orbitSpeed: asteroidConfig.orbitSpeed,
+                radius: asteroidConfig.radius,
+                color: asteroidConfig.color || getRandomAsteroidColor(),
+                rotationAngle: 0,
+                rotationSpeed: Math.random() * 0.3 - 0.15, // Slower rotation speed
+            });
+        });
+    }
+    
     // Update level indicator
     const levelIndicator = document.getElementById('levelIndicator');
     levelIndicator.textContent = `Level ${levelConfig.id}: ${levelConfig.name}`;
@@ -118,7 +143,30 @@ function loadLevelConfig(levelConfig) {
 }
 
 /**
- * Update positions of planets
+ * Get a random color for asteroids
+ * @returns {string} - A hex color code
+ */
+function getRandomAsteroidColor() {
+    const colors = [
+        '#8B5A00', // Brown
+        '#9E9E9E', // Gray
+        '#A0522D', // Sienna
+        '#696969', // Dim Gray
+        '#8B4513', // SaddleBrown
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+}
+
+/**
+ * Set rocket orbit angle from degrees
+ * @param {number} degrees - Angle in degrees (0-360)
+ */
+function setRocketOrbitAngle(degrees) {
+    rocket.orbitAngle = (degrees * Math.PI) / 180;
+}
+
+/**
+ * Update positions of planets and asteroids
  * @param {number} deltaTime - Time elapsed since last update in seconds
  */
 function updatePlanetPositions(deltaTime) {
@@ -129,6 +177,13 @@ function updatePlanetPositions(deltaTime) {
     // Update planet 2 position
     planet2.angle += planet2.orbitSpeed * deltaTime;
     planet2.rotationAngle += planet2.rotationSpeed * deltaTime;
+    
+    // Update asteroid positions
+    for (let i = 0; i < asteroids.length; i++) {
+        const asteroid = asteroids[i];
+        asteroid.angle += asteroid.orbitSpeed * deltaTime;
+        asteroid.rotationAngle += asteroid.rotationSpeed * deltaTime;
+    }
 }
 
 /**
@@ -154,6 +209,9 @@ function updateRocket(deltaTime) {
         // Update rocket position
         rocket.x += rocket.velX * deltaTime;
         rocket.y += rocket.velY * deltaTime;
+        
+        // Update rocket angle (for rendering)
+        rocket.rocketAngle = Math.atan2(rocket.velY, rocket.velX);
         
         // Add to trail
         if (gameActive) {
@@ -208,6 +266,33 @@ function updateRocket(deltaTime) {
             }, 1500);
         }
         
+        // Check for collision with asteroids
+        for (let i = 0; i < asteroids.length; i++) {
+            const asteroid = asteroids[i];
+            const asteroidX = sun.x + Math.cos(asteroid.angle) * asteroid.distance;
+            const asteroidY = sun.y + Math.sin(asteroid.angle) * asteroid.distance;
+            
+            const dxAsteroid = asteroidX - rocket.x;
+            const dyAsteroid = asteroidY - rocket.y;
+            const distToAsteroidSq = dxAsteroid * dxAsteroid + dyAsteroid * dyAsteroid;
+            
+            if (distToAsteroidSq <= (asteroid.radius + rocket.radius) * (asteroid.radius + rocket.radius)) {
+                // Collision with asteroid - lose!
+                gameActive = false;
+                currentState = GAME_STATE.LOSE;
+                document.getElementById('gameStatus').textContent = 'Crashed into an asteroid! Try again.';
+                document.getElementById('gameStatus').className = 'status lose';
+                
+                // Create explosion particles
+                const explosionParticles = createExplosion(rocket.x, rocket.y, 40, '#e74c3c');
+                rocket.particles.push(...explosionParticles);
+                
+                // Add sound effect
+                playSound(220, 0.3); // Low A note
+                break;
+            }
+        }
+        
         // Check for out of bounds or time's up
         const buffer = 50;
         if (rocket.x < -buffer || rocket.x > canvas.width + buffer || 
@@ -229,9 +314,16 @@ function updateRocket(deltaTime) {
         const planet1X = sun.x + Math.cos(planet1.angle) * planet1.distance;
         const planet1Y = sun.y + Math.sin(planet1.angle) * planet1.distance;
         
-        // Position slightly offset from planet surface (in direction from planet center)
-        rocket.x = planet1X + Math.cos(planet1.angle) * (planet1.radius + rocket.radius + 2);
-        rocket.y = planet1Y + Math.sin(planet1.angle) * (planet1.radius + rocket.radius + 2);
+        // Position based on rocket.orbitAngle around planet1
+        // Calculate the total angle (planet angle + orbit angle)
+        const totalAngle = planet1.angle + rocket.orbitAngle;
+        
+        // Position rocket at this angle, offset from planet surface
+        rocket.x = planet1X + Math.cos(totalAngle) * (planet1.radius + rocket.radius + 2);
+        rocket.y = planet1Y + Math.sin(totalAngle) * (planet1.radius + rocket.radius + 2);
+        
+        // Update rocket angle for rendering to point in direction of movement
+        rocket.rocketAngle = totalAngle;
     }
 }
 
@@ -259,8 +351,11 @@ function launchRocket() {
     if (!rocket.active && gameActive) {
         rocket.active = true;
         
-        // Calculate launch vector (tangent to orbit)
-        const launchAngle = planet1.angle + Math.PI/2;
+        // Use the total angle for launch direction (planet angle + orbit angle)
+        // Launch in the direction the rocket is pointing
+        const launchAngle = planet1.angle + rocket.orbitAngle;
+        
+        // Set initial velocity based on rocket speed and direction
         rocket.velX = Math.cos(launchAngle) * rocket.speed;
         rocket.velY = Math.sin(launchAngle) * rocket.speed;
         
@@ -276,7 +371,23 @@ function launchRocket() {
  * Apply boost to the rocket
  */
 function boostRocket() {
-    if (rocket.active && gameActive && rocket.fuel > 0) {
+    if (rocket.active && gameActive) {
+        // Check if there's enough fuel
+        if (rocket.fuel < 25) {
+            // Play a "out of fuel" sound effect - lower pitch and shorter
+            playSound(220, 0.1); // Low A note, shorter duration
+            
+            // Visual feedback that boost failed
+            const actionBtn = document.getElementById('actionBtn');
+            actionBtn.classList.add('boost-error');
+            setTimeout(() => {
+                actionBtn.classList.remove('boost-error');
+            }, 300);
+            
+            return; // Exit without applying boost
+        }
+        
+        // We have enough fuel, apply the boost
         // Calculate current direction of travel
         const direction = Math.atan2(rocket.velY, rocket.velX);
         
@@ -327,6 +438,14 @@ function resetGame() {
     planet1.rotationAngle = 0;
     planet2.rotationAngle = 0;
     
+    // Reset asteroid angles
+    for (let i = 0; i < asteroids.length; i++) {
+        if (levelConfig.asteroids && levelConfig.asteroids[i]) {
+            asteroids[i].angle = levelConfig.asteroids[i].startAngle;
+        }
+        asteroids[i].rotationAngle = 0;
+    }
+    
     rocket.active = false;
     rocket.x = 0;
     rocket.y = 0;
@@ -334,6 +453,7 @@ function resetGame() {
     rocket.trail = [];
     rocket.fuel = 100;
     rocket.boosting = false;
+    rocket.orbitAngle = Math.PI/2; // Reset to perpendicular launch
     
     gameTime = 0;
     gameActive = true;
@@ -355,4 +475,34 @@ function resetGame() {
     
     // Show level indicator
     document.getElementById('levelIndicator').style.display = 'block';
+}
+
+/**
+ * Add a new asteroid to the game at specified position
+ * @param {number} distance - Distance from sun
+ * @param {number} angle - Angle in radians
+ * @param {number} radius - Radius of the asteroid
+ * @param {number} orbitSpeed - Speed of orbit in radians per second
+ * @param {string} color - Color of the asteroid (optional)
+ */
+function addAsteroid(distance, angle, radius, orbitSpeed, color) {
+    asteroids.push({
+        distance: distance,
+        angle: angle,
+        orbitSpeed: orbitSpeed,
+        radius: radius,
+        color: color || getRandomAsteroidColor(),
+        rotationAngle: 0,
+        rotationSpeed: Math.random() * 0.3 - 0.15, // Slower rotation speed
+    });
+}
+
+/**
+ * Remove an asteroid from the game
+ * @param {number} index - Index of the asteroid to remove
+ */
+function removeAsteroid(index) {
+    if (index >= 0 && index < asteroids.length) {
+        asteroids.splice(index, 1);
+    }
 }

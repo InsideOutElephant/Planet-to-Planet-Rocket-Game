@@ -261,12 +261,77 @@ function draw() {
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
     ctx.stroke();
     
+    // Draw asteroid orbit paths
+    for (const asteroid of asteroids) {
+        ctx.beginPath();
+        ctx.arc(sun.x, sun.y, asteroid.distance, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.setLineDash([2, 4]); // Dashed line for asteroid orbits
+        ctx.stroke();
+        ctx.setLineDash([]); // Reset dash
+    }
+    
     // Calculate planet positions
     const planet1X = sun.x + Math.cos(planet1.angle) * planet1.distance;
     const planet1Y = sun.y + Math.sin(planet1.angle) * planet1.distance;
     
     const planet2X = sun.x + Math.cos(planet2.angle) * planet2.distance;
     const planet2Y = sun.y + Math.sin(planet2.angle) * planet2.distance;
+    
+    // Draw asteroids
+    for (const asteroid of asteroids) {
+        const asteroidX = sun.x + Math.cos(asteroid.angle) * asteroid.distance;
+        const asteroidY = sun.y + Math.sin(asteroid.angle) * asteroid.distance;
+        
+        // Draw irregular asteroid shape
+        ctx.save();
+        ctx.translate(asteroidX, asteroidY);
+        ctx.rotate(asteroid.rotationAngle);
+        
+        // Draw irregular asteroid
+        ctx.beginPath();
+        const segments = 8;
+        for (let i = 0; i < segments; i++) {
+            const angle = (i / segments) * Math.PI * 2;
+            const radiusVariation = 0.7 + Math.sin(i * 3) * 0.3;
+            const radius = asteroid.radius * radiusVariation;
+            
+            if (i === 0) {
+                ctx.moveTo(Math.cos(angle) * radius, Math.sin(angle) * radius);
+            } else {
+                ctx.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius);
+            }
+        }
+        ctx.closePath();
+        
+        // Create a gradient for the asteroid to give it dimension
+        const gradientAsteroid = ctx.createRadialGradient(
+            -asteroid.radius * 0.3, -asteroid.radius * 0.3, 0,
+            0, 0, asteroid.radius * 1.2
+        );
+        gradientAsteroid.addColorStop(0, asteroid.color);
+        gradientAsteroid.addColorStop(1, darkenColor(asteroid.color, 0.7));
+        
+        ctx.fillStyle = gradientAsteroid;
+        ctx.fill();
+        
+        // Add some texture/details to the asteroid
+        const craterCount = Math.floor(asteroid.radius / 3);
+        for (let i = 0; i < craterCount; i++) {
+            const craterAngle = Math.random() * Math.PI * 2;
+            const craterDistance = Math.random() * asteroid.radius * 0.7;
+            const craterX = Math.cos(craterAngle) * craterDistance;
+            const craterY = Math.sin(craterAngle) * craterDistance;
+            const craterRadius = Math.random() * asteroid.radius * 0.2 + asteroid.radius * 0.1;
+            
+            ctx.beginPath();
+            ctx.arc(craterX, craterY, craterRadius, 0, Math.PI * 2);
+            ctx.fillStyle = darkenColor(asteroid.color, 0.5);
+            ctx.fill();
+        }
+        
+        ctx.restore();
+    }
     
     // Draw planet 1 with a feature to show rotation
     ctx.beginPath();
@@ -314,14 +379,8 @@ function draw() {
     const rocketLength = rocket.radius * 3;
     const rocketWidth = rocket.radius * 1.5;
     
-    // Calculate rocket direction based on velocity
-    let rocketAngle = 0;
-    if (rocket.active) {
-        rocketAngle = Math.atan2(rocket.velY, rocket.velX);
-    } else {
-        // When not active, point away from planet1 (tangential to orbit)
-        rocketAngle = planet1.angle + Math.PI/2;
-    }
+    // Calculate rocket direction based on velocity or orbit
+    let rocketAngle = rocket.rocketAngle;
     
     ctx.save();
     ctx.translate(rocket.x, rocket.y);
@@ -378,4 +437,33 @@ function draw() {
         ctx.fillStyle = `rgba(255, 180, 0, ${p.alpha})`;
         ctx.fill();
     }
+}
+
+/**
+ * Darken a color by a given amount
+ * @param {string} color - Hex color code
+ * @param {number} amount - Amount to darken (0-1)
+ * @returns {string} - Darkened color
+ */
+function darkenColor(color, amount) {
+    // Remove # if present
+    color = color.replace('#', '');
+    
+    // Parse the color
+    let r = parseInt(color.substring(0, 2), 16);
+    let g = parseInt(color.substring(2, 4), 16);
+    let b = parseInt(color.substring(4, 6), 16);
+    
+    // Darken
+    r = Math.floor(r * amount);
+    g = Math.floor(g * amount);
+    b = Math.floor(b * amount);
+    
+    // Ensure values are in valid range
+    r = Math.min(255, Math.max(0, r));
+    g = Math.min(255, Math.max(0, g));
+    b = Math.min(255, Math.max(0, b));
+    
+    // Convert back to hex
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }

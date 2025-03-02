@@ -20,7 +20,8 @@ let editingLevel = {
     },
     timeLimit: 7,
     icon: "✏️",
-    description: "A custom level created in the level editor."
+    description: "A custom level created in the level editor.",
+    asteroids: [] // Array to hold asteroid configurations
 };
 
 // Flag to indicate if we're currently testing a level
@@ -156,6 +157,33 @@ function showLevelEditor(resetToDefaults = true) {
             updateOrbitPreview();
         }, 8, 25, 1);
         
+        // Create asteroids section
+        const asteroidsSection = document.createElement('fieldset');
+        asteroidsSection.className = 'planet-section';
+        const asteroidsLegend = document.createElement('legend');
+        asteroidsLegend.textContent = 'Asteroids';
+        asteroidsLegend.style.color = '#f39c12';
+        asteroidsSection.appendChild(asteroidsLegend);
+        form.appendChild(asteroidsSection);
+        
+        // Create asteroid list container
+        const asteroidListContainer = document.createElement('div');
+        asteroidListContainer.id = 'asteroidListContainer';
+        asteroidListContainer.className = 'asteroid-list-container';
+        asteroidsSection.appendChild(asteroidListContainer);
+        
+        // Create add asteroid button
+        const addAsteroidButton = document.createElement('button');
+        addAsteroidButton.textContent = 'Add Asteroid';
+        addAsteroidButton.className = 'editor-button';
+        addAsteroidButton.type = 'button';
+        addAsteroidButton.style.backgroundColor = '#f39c12';
+        addAsteroidButton.style.marginTop = '10px';
+        addAsteroidButton.addEventListener('click', () => {
+            addAsteroidToEditor();
+        });
+        asteroidsSection.appendChild(addAsteroidButton);
+        
         // Create buttons container
         const buttonsContainer = document.createElement('div');
         buttonsContainer.className = 'editor-buttons';
@@ -200,8 +228,11 @@ function showLevelEditor(resetToDefaults = true) {
         });
         buttonsContainer.appendChild(backButton);
     } else {
-        // Update input values to match the reset editingLevel
+        // Update input values to match the editing level
         updateEditorInputs();
+        
+        // Rebuild the asteroid list
+        rebuildAsteroidList();
     }
     
     // Show the editor screen
@@ -220,6 +251,163 @@ function showLevelEditor(resetToDefaults = true) {
     
     // Update the preview
     updateOrbitPreview();
+}
+
+/**
+ * Add a new asteroid to the level editor
+ */
+function addAsteroidToEditor() {
+    // Create a new asteroid with default values
+    const newAsteroid = {
+        distance: 180, // Default distance between planet1 and planet2
+        startAngle: Math.random() * Math.PI * 2, // Random angle
+        orbitSpeed: 0.4 + (Math.random() * 0.4 - 0.2), // Random speed around 0.4
+        radius: 8 + Math.floor(Math.random() * 5), // Random size between 8-12
+        color: getRandomAsteroidColor()
+    };
+    
+    // Add to the editing level
+    editingLevel.asteroids.push(newAsteroid);
+    
+    // Add to the editor UI
+    addAsteroidToList(newAsteroid, editingLevel.asteroids.length - 1);
+    
+    // Update the preview
+    updateOrbitPreview();
+}
+
+/**
+ * Add an asteroid to the UI list
+ * @param {Object} asteroid - The asteroid configuration object
+ * @param {number} index - The index of the asteroid in the array
+ */
+function addAsteroidToList(asteroid, index) {
+    const container = document.getElementById('asteroidListContainer');
+    
+    // Create asteroid item container
+    const asteroidItem = document.createElement('div');
+    asteroidItem.className = 'asteroid-item';
+    asteroidItem.dataset.index = index;
+    asteroidItem.style.border = '1px solid #f39c12';
+    asteroidItem.style.borderRadius = '5px';
+    asteroidItem.style.padding = '10px';
+    asteroidItem.style.marginBottom = '10px';
+    asteroidItem.style.position = 'relative';
+    
+    // Add asteroid header
+    const header = document.createElement('div');
+    header.textContent = `Asteroid ${index + 1}`;
+    header.style.fontWeight = 'bold';
+    header.style.marginBottom = '5px';
+    header.style.color = '#f39c12';
+    asteroidItem.appendChild(header);
+    
+    // Add remove button
+    const removeBtn = document.createElement('button');
+    removeBtn.textContent = '✕';
+    removeBtn.className = 'remove-asteroid-btn';
+    removeBtn.style.position = 'absolute';
+    removeBtn.style.top = '5px';
+    removeBtn.style.right = '5px';
+    removeBtn.style.backgroundColor = '#e74c3c';
+    removeBtn.style.color = 'white';
+    removeBtn.style.border = 'none';
+    removeBtn.style.borderRadius = '3px';
+    removeBtn.style.padding = '2px 6px';
+    removeBtn.style.cursor = 'pointer';
+    removeBtn.addEventListener('click', () => {
+        removeAsteroidFromEditor(index);
+    });
+    asteroidItem.appendChild(removeBtn);
+    
+    // Create distance slider
+    createInputGroup(asteroidItem, 'range', `asteroid${index}Distance`, 'Distance:', asteroid.distance, (value) => {
+        editingLevel.asteroids[index].distance = parseInt(value);
+        document.getElementById(`asteroid${index}Distance-value`).textContent = value;
+        updateOrbitPreview();
+    }, 60, 350, 5);
+    
+    // Create angle slider
+    const angleDegrees = Math.round((asteroid.startAngle * 180) / Math.PI);
+    createInputGroup(asteroidItem, 'range', `asteroid${index}StartAngle`, 'Start Angle:', angleDegrees, (value) => {
+        editingLevel.asteroids[index].startAngle = (parseInt(value) * Math.PI) / 180;
+        document.getElementById(`asteroid${index}StartAngle-value`).textContent = value + '°';
+        updateOrbitPreview();
+    }, 0, 360, 15);
+    
+    // Create orbit speed slider
+    createInputGroup(asteroidItem, 'range', `asteroid${index}OrbitSpeed`, 'Orbit Speed:', asteroid.orbitSpeed, (value) => {
+        editingLevel.asteroids[index].orbitSpeed = parseFloat(value);
+        document.getElementById(`asteroid${index}OrbitSpeed-value`).textContent = value;
+        updateOrbitPreview();
+    }, -1.5, 1.5, 0.1);
+    
+    // Create size slider
+    createInputGroup(asteroidItem, 'range', `asteroid${index}Radius`, 'Size:', asteroid.radius, (value) => {
+        editingLevel.asteroids[index].radius = parseInt(value);
+        document.getElementById(`asteroid${index}Radius-value`).textContent = value;
+        updateOrbitPreview();
+    }, 5, 15, 1);
+    
+    // Add color picker
+    const colorContainer = document.createElement('div');
+    colorContainer.className = 'input-group';
+    
+    const colorLabel = document.createElement('label');
+    colorLabel.textContent = 'Color:';
+    colorLabel.htmlFor = `asteroid${index}Color`;
+    colorContainer.appendChild(colorLabel);
+    
+    const colorInput = document.createElement('input');
+    colorInput.type = 'color';
+    colorInput.id = `asteroid${index}Color`;
+    colorInput.value = asteroid.color;
+    colorInput.style.margin = '0 10px';
+    colorInput.addEventListener('input', () => {
+        editingLevel.asteroids[index].color = colorInput.value;
+        updateOrbitPreview();
+    });
+    
+    const inputContainer = document.createElement('div');
+    inputContainer.className = 'input-container';
+    inputContainer.appendChild(colorInput);
+    colorContainer.appendChild(inputContainer);
+    
+    asteroidItem.appendChild(colorContainer);
+    
+    // Add to container
+    container.appendChild(asteroidItem);
+}
+
+/**
+ * Remove an asteroid from the editor
+ * @param {number} indexToRemove - The index of the asteroid to remove
+ */
+function removeAsteroidFromEditor(indexToRemove) {
+    // Remove from the array
+    editingLevel.asteroids.splice(indexToRemove, 1);
+    
+    // Rebuild the list UI
+    rebuildAsteroidList();
+    
+    // Update preview
+    updateOrbitPreview();
+}
+
+/**
+ * Rebuild the entire asteroid list UI
+ */
+function rebuildAsteroidList() {
+    const container = document.getElementById('asteroidListContainer');
+    if (!container) return;
+    
+    // Clear the container
+    container.innerHTML = '';
+    
+    // Rebuild the list
+    editingLevel.asteroids.forEach((asteroid, index) => {
+        addAsteroidToList(asteroid, index);
+    });
 }
 
 /**
@@ -314,11 +502,18 @@ function resetEditorToDefault() {
         },
         timeLimit: level1.timeLimit,
         icon: "✏️",
-        description: "A custom level created in the level editor."
+        description: "A custom level created in the level editor.",
+        asteroids: [] // Clear asteroids
     };
+    
+    // Also clear the cached asteroids to prevent them from coming back
+    window.cachedAsteroids = [];
     
     // Update the UI if it exists
     updateEditorInputs();
+    
+    // Rebuild asteroid list (should be empty now)
+    rebuildAsteroidList();
     
     // Update the preview
     updateOrbitPreview();
@@ -380,6 +575,16 @@ function createInputGroup(parent, type, id, label, defaultValue, onChangeHandler
  * Test the custom level
  */
 function testCustomLevel() {
+    // Cache the asteroid settings prior to switching screens
+    // This ensures they won't be lost when returning to the editor
+    if (editingLevel.asteroids && editingLevel.asteroids.length > 0) {
+        // Make a deep copy to ensure values are preserved
+        window.cachedAsteroids = JSON.parse(JSON.stringify(editingLevel.asteroids));
+    } else {
+        // Clear the cache if there are no asteroids
+        window.cachedAsteroids = [];
+    }
+    
     // Hide the editor screen
     document.getElementById('levelEditorScreen').style.display = 'none';
     
@@ -428,7 +633,7 @@ function addReturnToEditorButton() {
         // Reset testing flag
         testingCustomLevel = false;
         
-        // Show the editor again but don't reset to defaults (keep current settings)
+        // Return to the editor without resetting values
         showLevelEditor(false);
     });
     
@@ -500,8 +705,18 @@ function updateOrbitPreview() {
     const centerX = width / 2;
     const centerY = height / 2;
     
+    // Calculate max orbit distance (including asteroids if any)
+    let maxOrbitDistance = Math.max(
+        editingLevel.planet1.distance, 
+        editingLevel.planet2.distance
+    );
+    
+    if (editingLevel.asteroids && editingLevel.asteroids.length > 0) {
+        const maxAsteroidDistance = Math.max(...editingLevel.asteroids.map(a => a.distance));
+        maxOrbitDistance = Math.max(maxOrbitDistance, maxAsteroidDistance);
+    }
+    
     // Scale factor to fit orbits into the preview canvas
-    const maxOrbitDistance = Math.max(editingLevel.planet1.distance, editingLevel.planet2.distance);
     const scaleFactor = (Math.min(width, height) * 0.4) / maxOrbitDistance;
     
     // Clear canvas
@@ -526,12 +741,59 @@ function updateOrbitPreview() {
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
     ctx.stroke();
     
+    // Draw asteroid orbit paths
+    if (editingLevel.asteroids && editingLevel.asteroids.length > 0) {
+        for (const asteroid of editingLevel.asteroids) {
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, asteroid.distance * scaleFactor, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.setLineDash([2, 4]); // Dashed line for asteroid orbits
+            ctx.stroke();
+            ctx.setLineDash([]); // Reset dash
+        }
+    }
+    
     // Calculate planet positions
     const p1X = centerX + Math.cos(editingLevel.planet1.startAngle) * (editingLevel.planet1.distance * scaleFactor);
     const p1Y = centerY + Math.sin(editingLevel.planet1.startAngle) * (editingLevel.planet1.distance * scaleFactor);
     
     const p2X = centerX + Math.cos(editingLevel.planet2.startAngle) * (editingLevel.planet2.distance * scaleFactor);
     const p2Y = centerY + Math.sin(editingLevel.planet2.startAngle) * (editingLevel.planet2.distance * scaleFactor);
+    
+    // Draw asteroids
+    if (editingLevel.asteroids && editingLevel.asteroids.length > 0) {
+        for (const asteroid of editingLevel.asteroids) {
+            const asteroidX = centerX + Math.cos(asteroid.startAngle) * (asteroid.distance * scaleFactor);
+            const asteroidY = centerY + Math.sin(asteroid.startAngle) * (asteroid.distance * scaleFactor);
+            
+            // Draw irregular asteroid
+            ctx.save();
+            ctx.translate(asteroidX, asteroidY);
+            
+            // Draw irregular asteroid shape
+            ctx.beginPath();
+            const segments = 8;
+            const asteroidRadius = Math.max(3, asteroid.radius * scaleFactor * 0.5);
+            
+            for (let i = 0; i < segments; i++) {
+                const angle = (i / segments) * Math.PI * 2;
+                const radiusVariation = 0.7 + Math.sin(i * 3) * 0.3;
+                const radius = asteroidRadius * radiusVariation;
+                
+                if (i === 0) {
+                    ctx.moveTo(Math.cos(angle) * radius, Math.sin(angle) * radius);
+                } else {
+                    ctx.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius);
+                }
+            }
+            ctx.closePath();
+            
+            ctx.fillStyle = asteroid.color;
+            ctx.fill();
+            
+            ctx.restore();
+        }
+    }
     
     // Draw planet 1 (blue)
     const p1Radius = Math.max(5, editingLevel.planet1.radius * scaleFactor * 0.5);
@@ -616,7 +878,14 @@ function saveLevelToFile() {
             orbitSpeed: editingLevel.planet2.orbitSpeed,
             radius: editingLevel.planet2.radius
         },
-        timeLimit: editingLevel.timeLimit
+        timeLimit: editingLevel.timeLimit,
+        asteroids: editingLevel.asteroids.map(asteroid => ({
+            distance: asteroid.distance,
+            startAngle: asteroid.startAngle,
+            orbitSpeed: asteroid.orbitSpeed,
+            radius: asteroid.radius,
+            color: asteroid.color
+        }))
     };
     
     // Convert to JSON string
@@ -682,8 +951,28 @@ function loadLevelFromFile() {
                 editingLevel.planet2.orbitSpeed = loadedLevel.planet2.orbitSpeed;
                 editingLevel.planet2.radius = loadedLevel.planet2.radius;
                 
+                // Load asteroids if present
+                if (loadedLevel.asteroids && Array.isArray(loadedLevel.asteroids)) {
+                    editingLevel.asteroids = loadedLevel.asteroids.map(a => ({
+                        distance: a.distance,
+                        startAngle: a.startAngle,
+                        orbitSpeed: a.orbitSpeed,
+                        radius: a.radius,
+                        color: a.color || getRandomAsteroidColor()
+                    }));
+                    
+                    // Also update the cached asteroids
+                    window.cachedAsteroids = JSON.parse(JSON.stringify(editingLevel.asteroids));
+                } else {
+                    editingLevel.asteroids = [];
+                    window.cachedAsteroids = [];
+                }
+                
                 // Update the UI
                 updateEditorInputs();
+                
+                // Rebuild asteroid list
+                rebuildAsteroidList();
                 
                 // Update the preview
                 updateOrbitPreview();
