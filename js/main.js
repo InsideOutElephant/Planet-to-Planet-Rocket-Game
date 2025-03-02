@@ -2,9 +2,6 @@
  * Main entry point for the game
  */
 
-// Import VR functionality
-import { initWebXR, vrMode } from './webxr.js';
-
 // Initialize the game when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     // Get canvas and context
@@ -15,9 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initEntities(canvas);
     initRenderer(ctx);
     setupInputHandlers();
-    
-    // Initialize WebXR for VR support
-    initWebXR(canvas);
     
     // Load saved progress
     initLevelProgress();
@@ -45,11 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let lastTime = 0;
     
     function gameLoop(timestamp) {
-        // Check if we're in VR mode
-        if (vrMode) {
-            return; // VR mode handles its own rendering loop
-        }
-        
         // Calculate delta time (in seconds)
         const deltaTime = Math.min(0.05, (timestamp - lastTime) / 1000); // Cap at 50ms
         lastTime = timestamp;
