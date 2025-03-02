@@ -118,6 +118,22 @@ function showLevelSelectScreen() {
         levelGrid.className = 'level-grid';
         levelSelectScreen.appendChild(levelGrid);
         
+        // Create button container
+        const buttonContainer = document.createElement('div');
+        buttonContainer.className = 'level-select-buttons';
+        levelSelectScreen.appendChild(buttonContainer);
+        
+        // Create level editor button
+        const editorButton = document.createElement('button');
+        editorButton.textContent = 'Level Editor';
+        editorButton.id = 'levelEditorButton';
+        editorButton.addEventListener('click', () => {
+            levelSelectScreen.style.display = 'none';
+            // Call the level editor function
+            showLevelEditor();
+        });
+        buttonContainer.appendChild(editorButton);
+        
         // Create back button
         const backButton = document.createElement('button');
         backButton.textContent = 'Back to Main Menu';
@@ -126,7 +142,7 @@ function showLevelSelectScreen() {
             levelSelectScreen.style.display = 'none';
             document.getElementById('startScreen').style.display = 'flex';
         });
-        levelSelectScreen.appendChild(backButton);
+        buttonContainer.appendChild(backButton);
         
         // Create level buttons
         for (let i = 0; i < levels.length; i++) {
@@ -211,9 +227,18 @@ function showLevelSelectScreen() {
         });
     }
     
-    // Show the level select screen
+    // Show the level select screen and hide the game canvas
     levelSelectScreen.style.display = 'flex';
     document.getElementById('startScreen').style.display = 'none';
+    
+    // Hide game elements
+    document.getElementById('gameCanvas').style.display = 'none';
+    document.querySelector('.controls').style.display = 'none';
+    document.querySelector('.game-info').style.display = 'none';
+    document.getElementById('levelIndicator').style.display = 'none';
+    
+    // Pause the game if it's running
+    pauseGame();
 }
 
 /**
@@ -236,6 +261,15 @@ function startLevel(levelId) {
     // Hide level select screen and start screen
     document.getElementById('levelSelectScreen').style.display = 'none';
     document.getElementById('startScreen').style.display = 'none';
+    
+    // Show game elements
+    document.getElementById('gameCanvas').style.display = 'block';
+    document.querySelector('.controls').style.display = 'flex';
+    document.querySelector('.game-info').style.display = 'block';
+    document.getElementById('levelIndicator').style.display = 'block';
+    
+    // Resume the game
+    resumeGame();
 }
 
 /**
@@ -244,6 +278,11 @@ function startLevel(levelId) {
  * @param {number} stars - Star rating (1-3)
  */
 function showLevelCompleteScreen(newLevelUnlocked, stars) {
+    // Check if we're in a custom level from the editor
+    if (typeof handleLevelCompleteForEditor === 'function' && handleLevelCompleteForEditor(stars)) {
+        return; // Custom handling for editor levels
+    }
+    
     // Create level complete screen if it doesn't exist
     let levelCompleteScreen = document.getElementById('levelCompleteScreen');
     

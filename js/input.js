@@ -25,8 +25,15 @@ function setupInputHandlers() {
     // Reset/retry button
     document.getElementById('resetBtn').addEventListener('click', resetGame);
     
-    // Keyboard controls
+    // Keyboard controls - modified to check if we're in the editor or typing in an input
     document.addEventListener('keydown', (e) => {
+        // Don't process keyboard shortcuts if typing in an input field
+        if (e.target.tagName === 'INPUT' || 
+            e.target.tagName === 'TEXTAREA' ||
+            document.getElementById('levelEditorScreen').style.display === 'flex') {
+            return;
+        }
+        
         if (e.code === 'Space') {
             handleActionButton();
         } else if (e.code === 'KeyR') {

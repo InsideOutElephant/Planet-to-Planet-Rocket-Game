@@ -2,6 +2,9 @@
  * Core game logic and state management
  */
 
+// Game paused state
+let gamePaused = false;
+
 /**
  * Update game state for a single frame
  * @param {number} deltaTime - Time elapsed since last update in seconds
@@ -65,4 +68,23 @@ function updateGame(deltaTime) {
             drawLoseAnimation(loseAnimProgress);
             break;
     }
+    
+    // Don't update if game is paused
+    if (gamePaused) {
+        return;
+    }
+}
+
+/**
+ * Pause the game
+ */
+function pauseGame() {
+    gamePaused = true;
+}
+
+/**
+ * Resume the game
+ */
+function resumeGame() {
+    gamePaused = false;
 }

@@ -306,3 +306,233 @@ button:disabled {
     font-size: 12px;
     margin-top: 5px;
 }
+
+/* Level Select Buttons */
+.level-select-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* Level Editor Styles */
+#levelEditorScreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    z-index: 10;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+#levelEditorScreen h1 {
+    color: #4CAF50;
+    font-size: 36px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.editor-description {
+    color: white;
+    font-size: 16px;
+    max-width: 600px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.editor-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 800px;
+    padding: 20px;
+    background-color: rgba(50, 50, 50, 0.6);
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.editor-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.input-group label {
+    flex: 1;
+    color: white;
+    font-size: 16px;
+}
+
+.input-container {
+    flex: 2;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.input-container input[type="range"] {
+    flex: 1;
+}
+
+.range-value {
+    width: 45px;
+    color: #4CAF50;
+    font-weight: bold;
+    text-align: right;
+}
+
+.planet-section {
+    border: 1px solid #555;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+}
+
+.planet-section legend {
+    padding: 0 10px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.editor-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.editor-button {
+    padding: 12px 24px;
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    color: white;
+}
+
+.test-button {
+    background-color: #4CAF50;
+}
+
+.test-button:hover {
+    background-color: #45a049;
+}
+
+.save-button {
+    background-color: #9b59b6;
+}
+
+.save-button:hover {
+    background-color: #8e44ad;
+}
+
+.load-button {
+    background-color: #3498db;
+}
+
+.load-button:hover {
+    background-color: #2980b9;
+}
+
+.reset-button {
+    background-color: #f39c12;
+}
+
+.reset-button:hover {
+    background-color: #e67e22;
+}
+
+.back-button {
+    background-color: #7f8c8d;
+}
+
+.back-button:hover {
+    background-color: #95a5a6;
+}
+
+#returnToEditorBtn {
+    margin-left: 10px;
+}
+
+/* Custom level completion message */
+.custom-level-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.9);
+    padding: 30px;
+    border-radius: 15px;
+    border: 2px solid #4CAF50;
+    text-align: center;
+    z-index: 100;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.custom-level-message h2 {
+    color: #f1c40f;
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.custom-level-message p {
+    color: white;
+    margin-bottom: 20px;
+}
+
+.custom-level-message .buttons-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.custom-level-message button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #3498db;
+    color: white;
+}
+
+.custom-level-message button:hover {
+    background-color: #2980b9;
+}
+
+/* Notification styles */
+.editor-notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    background-color: rgba(46, 204, 113, 0.9);
+    color: white;
+    border-radius: 5px;
+    font-size: 16px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    transition: opacity 0.5s ease;
+}
+
+.notification-error {
+    background-color: rgba(231, 76, 60, 0.9);
+}
+
+.fade-out {
+    opacity: 0;
+}
