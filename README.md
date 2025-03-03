@@ -71,12 +71,16 @@ planet-to-planet-rocket/
 │   ├── entities.js          # Game objects and physics
 │   ├── game.js              # Core game logic
 │   ├── input.js             # User input handling
+│   ├── level-editor.js      # Level editor screen
 │   ├── level-select.js      # Level selection screen
 │   ├── levels.js            # Level definitions
 │   ├── main.js              # Main entry point
 │   ├── renderer.js          # 2D rendering
 │   └── utils.js             # Utility functions
-└── index.html               # Main HTML file
+├── media/
+│   └── gameplay.png         # Gameplay Screenshot
+├── index.html               # Main HTML file
+└── README.md                # Game Description
 ```
 
 ## 🛠️ Technologies Used
