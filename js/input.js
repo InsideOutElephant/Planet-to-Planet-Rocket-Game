@@ -37,23 +37,26 @@ function setupInputHandlers() {
             return;
         }
         
-        if (e.code === 'Space') {
-            handleActionButton();
-        } else if (e.code === 'KeyR') {
-            resetGame();
-        } else if ((e.code === 'ArrowLeft' || e.code === 'KeyA')) {
-            // Rotate rocket counterclockwise (before or after launch)
-            if (!rocket.active) {
-                rotateRocket(-10);
-            } else if (gameActive) {
-                rotateRocketInFlight(-15);
-            }
-        } else if ((e.code === 'ArrowRight' || e.code === 'KeyD')) {
-            // Rotate rocket clockwise (before or after launch)
-            if (!rocket.active) {
-                rotateRocket(10);
-            } else if (gameActive) {
-                rotateRocketInFlight(15);
+        // Only process game controls if not in WIN state
+        if (currentState !== GAME_STATE.WIN) {
+            if (e.code === 'Space') {
+                handleActionButton();
+            } else if (e.code === 'KeyR') {
+                resetGame();
+            } else if ((e.code === 'ArrowLeft' || e.code === 'KeyA')) {
+                // Rotate rocket counterclockwise (before or after launch)
+                if (!rocket.active && gameActive) {
+                    rotateRocket(-10);
+                } else if (gameActive) {
+                    rotateRocketInFlight(-15);
+                }
+            } else if ((e.code === 'ArrowRight' || e.code === 'KeyD')) {
+                // Rotate rocket clockwise (before or after launch)
+                if (!rocket.active && gameActive) {
+                    rotateRocket(10);
+                } else if (gameActive) {
+                    rotateRocketInFlight(15);
+                }
             }
         }
     });
@@ -79,10 +82,12 @@ function addRotationButtons() {
     rotateLeftBtn.title = 'Rotate Left';
     rotateLeftBtn.id = 'rotateLeftBtn';
     rotateLeftBtn.addEventListener('click', () => {
-        if (!rocket.active) {
-            rotateRocket(-15);
-        } else if (gameActive) {
-            rotateRocketInFlight(-15);
+        if (currentState !== GAME_STATE.WIN) {
+            if (!rocket.active && gameActive) {
+                rotateRocket(-15);
+            } else if (gameActive) {
+                rotateRocketInFlight(-15);
+            }
         }
     });
     
@@ -97,10 +102,12 @@ function addRotationButtons() {
     rotateRightBtn.title = 'Rotate Right';
     rotateRightBtn.id = 'rotateRightBtn';
     rotateRightBtn.addEventListener('click', () => {
-        if (!rocket.active) {
-            rotateRocket(15);
-        } else if (gameActive) {
-            rotateRocketInFlight(15);
+        if (currentState !== GAME_STATE.WIN) {
+            if (!rocket.active && gameActive) {
+                rotateRocket(15);
+            } else if (gameActive) {
+                rotateRocketInFlight(15);
+            }
         }
     });
     
@@ -193,13 +200,15 @@ function rotateRocketInFlight(degrees) {
 function handleActionButton() {
     const actionBtn = document.getElementById('actionBtn');
     
-    if (!rocket.active && gameActive) {
-        // Launch the rocket
-        launchRocket();
-        // Update button text
-        actionBtn.textContent = 'Boost Rocket 🔥';
-    } else if (rocket.active && gameActive) {
-        // Boost the rocket
-        boostRocket();
+    if (currentState !== GAME_STATE.WIN) {
+        if (!rocket.active && gameActive) {
+            // Launch the rocket
+            launchRocket();
+            // Update button text
+            actionBtn.textContent = 'Boost Rocket 🔥';
+        } else if (rocket.active && gameActive) {
+            // Boost the rocket
+            boostRocket();
+        }
     }
 }

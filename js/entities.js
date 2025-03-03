@@ -266,6 +266,23 @@ function updateRocket(deltaTime) {
             }, 1500);
         }
         
+        // Check for collision with sun
+        const distToSun = Math.sqrt(distSqToSun);
+        if (distToSun <= (sun.radius + rocket.radius)) {
+            // Collision with sun - lose!
+            gameActive = false;
+            currentState = GAME_STATE.LOSE;
+            document.getElementById('gameStatus').textContent = 'Burned up in the sun! Try again.';
+            document.getElementById('gameStatus').className = 'status lose';
+            
+            // Create explosion particles
+            const explosionParticles = createExplosion(rocket.x, rocket.y, 40, '#FDB813');
+            rocket.particles.push(...explosionParticles);
+            
+            // Add sound effect
+            playSound(220, 0.3); // Low A note
+        }
+
         // Check for collision with asteroids
         for (let i = 0; i < asteroids.length; i++) {
             const asteroid = asteroids[i];
@@ -355,7 +372,7 @@ function launchRocket() {
         // Launch in the direction the rocket is pointing
         const launchAngle = planet1.angle + rocket.orbitAngle;
         
-        // Set initial velocity based on rocket speed and direction
+        // Set initial velocity based on launch speed and direction
         rocket.velX = Math.cos(launchAngle) * rocket.speed;
         rocket.velY = Math.sin(launchAngle) * rocket.speed;
         

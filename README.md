@@ -2,7 +2,7 @@
 
 A physics-based orbital rocket game with 12 challenging levels and a star rating system!
 
-![Planet to Planet Rocket Game](https://github.com/yourusername/planet-to-planet-rocket/raw/main/screenshots/gameplay.png)
+![Planet to Planet Rocket Game](https://insideoutelephant.github.io/Planet-to-Planet-Rocket-Game/media/gameplay.png)
 
 ## 🎮 Play Now
 
@@ -24,9 +24,12 @@ Launch your rocket from the blue planet and navigate it to the red planet. Use t
 ### 🕹️ Controls
 
 - Adjust rocket launch speed using the slider
+- Use Left/Right arrow keys, A/D keys, or Rotation buttons to aim the rocket before and during flight
 - Click "Launch Rocket" or press SPACE to launch
 - Click the same button again or press SPACE for extra thrust (boost)
 - Press R key to retry level
+
+Note: All rocket controls (rotation, launch, and boost) are disabled when the Level Complete screen is showing.
 
 ### 🌟 Star Rating
 
@@ -38,7 +41,7 @@ Launch your rocket from the blue planet and navigate it to the red planet. Use t
 
 ### Play Online
 
-Just visit [https://insideoutelephant.github.io/planet-to-planet-rocket/](https://insideoutelephant.github.io/planet-to-planet-rocket/)
+Just visit [https://insideoutelephant.github.io/Planet-to-Planet-Rocket-Game/]https://insideoutelephant.github.io/Planet-to-Planet-Rocket-Game/)
 
 ### Run Locally
 
@@ -106,7 +109,16 @@ To add a new level, edit the `levels.js` file and add a new level object to the 
     },
     timeLimit: 6,
     icon: "🌟", // Use an emoji or character for the level icon
-    description: "Your level description here"
+    description: "Your level description here",
+    asteroids: [
+        {
+            distance: 200,
+            startAngle: 0,
+            orbitSpeed: 0.5,
+            radius: 10,
+            color: "#8B4513"
+        }
+    ]
 }
 ```
 
@@ -131,7 +143,7 @@ MIT License - See LICENSE file for details.
 
 ## 🙌 Credits
 
-- Game concept and implementation by [Your Name]
+- Game concept and implementation by Neil and Emmet
 - Sound effects created with Web Audio API
 
 ## 📣 Feedback and Contributions
@@ -140,4 +152,4 @@ Feedback, bug reports, and pull requests are welcome! Feel free to check the [is
 
 ---
 
-Made with ❤️ by [Your Name]
+Made with ❤️ by Neil and Emmet
