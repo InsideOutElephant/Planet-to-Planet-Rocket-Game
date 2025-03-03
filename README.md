@@ -41,7 +41,7 @@ Note: All rocket controls (rotation, launch, and boost) are disabled when the Le
 
 ### Play Online
 
-Just visit [https://insideoutelephant.github.io/Planet-to-Planet-Rocket-Game/]https://insideoutelephant.github.io/Planet-to-Planet-Rocket-Game/)
+Just visit [https://insideoutelephant.github.io/Planet-to-Planet-Rocket-Game/](https://insideoutelephant.github.io/Planet-to-Planet-Rocket-Game/)
 
 ### Run Locally
 
