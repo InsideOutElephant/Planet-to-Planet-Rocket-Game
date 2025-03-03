@@ -37,6 +37,34 @@ Note: All rocket controls (rotation, launch, and boost) are disabled when the Le
 - ⭐⭐ Complete the level using less than 75% of the allowed time
 - ⭐⭐⭐ Complete the level quickly and with more than 50% fuel remaining
 
+## 🏆 Achievement System
+
+The game includes an achievement system that rewards players for accomplishing various goals and challenges. Achievements are automatically tracked as you play and are saved between sessions.
+
+### How to View Achievements
+
+- Click the "Achievements 🏆" button on the main menu to view all available achievements
+- Locked achievements will appear grayed out with hidden descriptions
+- When you unlock an achievement, a notification will appear in the top-right corner of the screen
+
+### Available Achievements
+
+| Achievement | Name | Description | How to Earn |
+|-------------|------|-------------|------------|
+| 🏆 | Master Navigator | Complete all levels of the game | Beat all 12 levels |
+| ⭐ | Perfect Pilot | Complete all levels with three stars | Earn 3 stars on all 12 levels |
+| 🎯 | Pure Trajectory | Complete all levels without rotating or using fuel | Complete all levels without rotating before launch or using any fuel |
+| 💥 | Rock Collector | Crash into 10 asteroids | Collide with asteroids 10 times across any levels |
+| 🌌 | Deep Space Explorer | Fly far away from the sun | Fly your rocket beyond twice the distance of the outer planet |
+| 💾 | Level Designer | Save a level in the editor | Use the level editor to create and save a level |
+| 📂 | Level Loader | Load a level in the editor | Successfully load a previously saved level in the editor |
+
+### Tips for Achievement Hunting
+
+- For the "Pure Trajectory" achievement, you need perfect planning! Don't rotate your rocket before launch or use any fuel during flight.
+- To get three stars on a level, complete it quickly and preserve at least 50% of your fuel.
+- For "Deep Space Explorer," try using a high initial velocity and aiming away from the sun.
+
 ## 🔧 Installation
 
 ### Play Online
@@ -68,6 +96,7 @@ planet-to-planet-rocket/
 ├── css/
 │   └── styles.css           # Game styling
 ├── js/
+│   ├── achievements.js      # Achievement system
 │   ├── entities.js          # Game objects and physics
 │   ├── game.js              # Core game logic
 │   ├── input.js             # User input handling

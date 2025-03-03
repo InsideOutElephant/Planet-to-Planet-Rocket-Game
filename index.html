@@ -19,6 +19,7 @@
         <div style="display: flex; gap: 15px;">
             <button id="startButton">Start Level 1</button>
             <button id="levelSelectButton">Level Select</button>
+            <button id="achievementsButton">Achievements 🏆</button>
         </div>
     </div>
     
@@ -38,7 +39,15 @@
         <div class="status" id="gameStatus"></div>
     </div>
 
+    <!-- Achievements Screen -->
+    <div id="achievementsScreen" class="achievements-screen">
+        <h1>Achievements</h1>
+        <div class="achievements-grid" id="achievementsGrid"></div>
+        <button id="closeAchievementsButton" class="back-button">Back to Menu</button>
+    </div>
+
     <!-- Scripts -->
+    <script src="js/achievements.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/levels.js"></script>
     <script src="js/level-select.js"></script>

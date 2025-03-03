@@ -306,6 +306,12 @@ function updateRocket(deltaTime) {
                 
                 // Add sound effect
                 playSound(220, 0.3); // Low A note
+                
+                // New code: Track asteroid crash for achievement
+                if (typeof trackAsteroidCrash === 'function') {
+                    trackAsteroidCrash();
+                }
+                
                 break;
             }
         }
@@ -325,6 +331,20 @@ function updateRocket(deltaTime) {
             currentState = GAME_STATE.LOSE;
             document.getElementById('gameStatus').textContent = 'Time\'s up! Try again.';
             document.getElementById('gameStatus').className = 'status lose';
+        }
+        
+        // New code: Check if rocket is very far from the sun for deep space achievement
+        if (rocket.active) {
+            const dx = sun.x - rocket.x;
+            const dy = sun.y - rocket.y;
+            const distToSun = Math.sqrt(dx * dx + dy * dy);
+            
+            // If rocket is very far from the sun (e.g., 2x the outer planet distance)
+            if (distToSun > planet2.distance * 2) {
+                if (typeof trackDeepSpace === 'function') {
+                    trackDeepSpace();
+                }
+            }
         }
     } else {
         // Position rocket on planet 1's surface
@@ -478,6 +498,9 @@ function resetGame() {
     currentState = GAME_STATE.PLAYING;
     winAnimProgress = 0;
     loseAnimProgress = 0;
+    
+    // New code: Reset rotation tracking for achievements
+    window.usedRotation = false;
     
     // Reset UI
     const actionBtn = document.getElementById('actionBtn');

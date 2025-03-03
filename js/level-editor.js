@@ -910,6 +910,11 @@ function saveLevelToFile() {
     
     // Show success message
     showNotification('Level saved successfully!');
+
+    // Track achievement when a level is saved
+    if (typeof trackLevelSave === 'function') {
+        trackLevelSave();
+    }
 }
 
 /**
@@ -978,6 +983,12 @@ function loadLevelFromFile() {
                 updateOrbitPreview();
                 
                 showNotification('Level loaded successfully!');
+
+                // Track achievement when a level is loaded successfully
+                if (typeof trackLevelLoad === 'function') {
+                    trackLevelLoad();
+                }
+                
             } catch (error) {
                 console.error('Error loading level:', error);
                 showNotification('Error loading level file', true);

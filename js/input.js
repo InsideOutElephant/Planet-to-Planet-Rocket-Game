@@ -2,6 +2,9 @@
  * Input handling for the game
  */
 
+// Add a global rotation tracking flag at the beginning of the file
+window.usedRotation = false;
+
 /**
  * Setup event listeners for user input
  */
@@ -148,6 +151,9 @@ function rotateRocket(degrees) {
     
     // Update rocket angle
     setRocketOrbitAngle(currentDegrees);
+    
+    // Track that rotation was used for achievements
+    window.usedRotation = true;
 }
 
 /**

@@ -273,6 +273,23 @@ function startLevel(levelId) {
 }
 
 /**
+ * Track whether rotation and fuel were used for achievements
+ */
+function trackLevelCompletion(stars) {
+    // We need to add tracking variables to monitor if rotation or fuel was used
+    if (typeof checkAchievements === 'function') {
+        // Whether rotation was used before launch is tracked in input.js
+        const usedRotation = window.usedRotation || false;
+        
+        // Whether fuel was used is tracked by rocket.fuel being less than 100
+        const usedFuel = rocket.fuel < 100;
+        
+        // Call the achievement tracker
+        checkAchievements(currentLevel, usedRotation, usedFuel, stars);
+    }
+}
+
+/**
  * Show level complete screen with option to continue to next level
  * @param {boolean} newLevelUnlocked - Whether a new level was unlocked
  * @param {number} stars - Star rating (1-3)
@@ -385,6 +402,9 @@ function showLevelCompleteScreen(newLevelUnlocked, stars) {
         // Add the new message before the stars
         levelCompleteScreen.insertBefore(unlockMessage, document.getElementById('levelCompleteStars'));
     }
+    
+    // Track level completion for achievements
+    trackLevelCompletion(stars);
     
     // Show the level complete screen
     levelCompleteScreen.style.display = 'flex';
