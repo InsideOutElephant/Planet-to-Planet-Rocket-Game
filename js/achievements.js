@@ -260,16 +260,12 @@ function showAchievementsScreen() {
         ? JSON.parse(localStorage.getItem('unlockedAchievements')) 
         : [];
     
-    console.log("Unlocked achievements:", unlockedAchievements); // Debug
-    
     // Create achievement cards
     achievementKeys.forEach(key => {
         const achievement = ACHIEVEMENTS[key];
         
         // Check if this achievement is unlocked (check both the key and the id)
         const isUnlocked = unlockedAchievements.includes(achievement.id) || unlockedAchievements.includes(key);
-        
-        console.log(`Achievement ${key} (${achievement.id}): ${isUnlocked ? 'unlocked' : 'locked'}`); // Debug
         
         const card = document.createElement('div');
         card.className = `achievement-card ${isUnlocked ? 'unlocked' : 'locked'}`;
@@ -297,8 +293,8 @@ function showAchievementsScreen() {
         
         achievementsGrid.appendChild(card);
     });
-    
-    // Debug button (in development mode only)
+
+    // Debug buttons (in development mode only)
     if (localStorage.getItem('devMode') === 'true') {
         const debugBtn = document.createElement('button');
         debugBtn.textContent = 'Debug Achievements';
@@ -319,6 +315,16 @@ function showAchievementsScreen() {
         achievementsScreen.appendChild(resetBtn);
     }
     
+    // Hide other screens
+    document.getElementById('startScreen').style.display = 'none';
+    if (document.getElementById('levelSelectScreen')) {
+        document.getElementById('levelSelectScreen').style.display = 'none';
+    }
+    document.getElementById('gameCanvas').style.display = 'none';
+    document.querySelector('.controls').style.display = 'none';
+    document.querySelector('.game-info').style.display = 'none';
+    document.getElementById('levelIndicator').style.display = 'none';
+    
     // Display the achievements screen
     achievementsScreen.style.display = 'flex';
 }
@@ -336,7 +342,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (closeAchievementsButton) {
         closeAchievementsButton.addEventListener('click', () => {
+            // Hide achievements screen
             document.getElementById('achievementsScreen').style.display = 'none';
+            
+            // Show main menu
+            document.getElementById('startScreen').style.display = 'flex';
         });
     }
 });
