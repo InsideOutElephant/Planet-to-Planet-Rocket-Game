@@ -458,7 +458,7 @@ function boostRocket() {
                 actionBtn.style.opacity = '1';
                 actionBtn.disabled = false;
             }
-        }, 1000);
+        }, 250);
     }
 }
 
