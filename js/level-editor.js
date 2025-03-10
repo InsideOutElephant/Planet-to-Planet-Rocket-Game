@@ -600,14 +600,72 @@ function testCustomLevel() {
     // Load our custom level
     loadLevelConfig(editingLevel);
     
-    // Reset and start game
-    resetGame();
+    // Store current level temporarily and set the current level to a special value
+    // indicating we're testing a custom level
+    window.previousLevel = currentLevel;
+    currentLevel = 'custom';
+    
+    // Reset and start game with our custom configuration
+    resetCustomGame(editingLevel);
     
     // Resume the game
     resumeGame();
     
     // Add a return button to the game UI
     addReturnToEditorButton();
+}
+
+/**
+ * Reset the game specifically for custom levels
+ * @param {Object} customLevelConfig - The custom level configuration
+ */
+function resetCustomGame(customLevelConfig) {
+    // Reset planet angles based on custom level config
+    planet1.angle = customLevelConfig.planet1.startAngle;
+    planet2.angle = customLevelConfig.planet2.startAngle;
+    planet1.rotationAngle = 0;
+    planet2.rotationAngle = 0;
+    
+    // Reset asteroid angles
+    for (let i = 0; i < asteroids.length; i++) {
+        if (customLevelConfig.asteroids && customLevelConfig.asteroids[i]) {
+            asteroids[i].angle = customLevelConfig.asteroids[i].startAngle;
+        }
+        asteroids[i].rotationAngle = 0;
+    }
+    
+    rocket.active = false;
+    rocket.x = 0;
+    rocket.y = 0;
+    rocket.particles = [];
+    rocket.trail = [];
+    rocket.fuel = 100;
+    rocket.boosting = false;
+    rocket.orbitAngle = Math.PI/2; // Reset to perpendicular launch
+    
+    gameTime = 0;
+    gameActive = true;
+    gameWon = false;
+    currentState = GAME_STATE.PLAYING;
+    winAnimProgress = 0;
+    loseAnimProgress = 0;
+    
+    // New code: Reset rotation tracking for achievements
+    window.usedRotation = false;
+    
+    // Reset UI
+    const actionBtn = document.getElementById('actionBtn');
+    actionBtn.textContent = 'Launch Rocket';
+    actionBtn.disabled = false;
+    actionBtn.style.opacity = '1';
+    document.getElementById('speedInput').disabled = false;
+    document.getElementById('gameStatus').textContent = '';
+    document.getElementById('gameStatus').className = 'status';
+    document.getElementById('timer').textContent = '0.0';
+    document.getElementById('timer').style.color = 'white';
+    
+    // Show level indicator
+    document.getElementById('levelIndicator').style.display = 'block';
 }
 
 /**
