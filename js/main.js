@@ -38,9 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
         showLevelSelectScreen();
     });
     
-    // Load the first level configuration
-    loadLevelConfig(getLevel(1));
-    
     // Reset the game to initial state
     resetGame();
     
