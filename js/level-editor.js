@@ -254,15 +254,21 @@ function showLevelEditor(resetToDefaults = true) {
 }
 
 /**
- * Add a new asteroid to the level editor
+ * Add a new asteroid to the level editor with more precise random values
  */
 function addAsteroidToEditor() {
-    // Create a new asteroid with default values
+    // Generate random values with one decimal place
+    const randomDistance = Math.floor(Math.random() * (280 - 150) + 150);
+    const randomAngle = parseFloat((Math.random() * Math.PI * 2).toFixed(1));
+    const randomSpeed = parseFloat((Math.random() * 1.0 - 0.5).toFixed(1)); // -0.5 to 0.5 with one decimal
+    const randomRadius = Math.floor(Math.random() * 6) + 7; // 7-12 size range
+    
+    // Create a new asteroid with properly formatted values
     const newAsteroid = {
-        distance: 180, // Default distance between planet1 and planet2
-        startAngle: Math.random() * Math.PI * 2, // Random angle
-        orbitSpeed: 0.4 + (Math.random() * 0.4 - 0.2), // Random speed around 0.4
-        radius: 8 + Math.floor(Math.random() * 5), // Random size between 8-12
+        distance: randomDistance,
+        startAngle: randomAngle,
+        orbitSpeed: randomSpeed,
+        radius: randomRadius,
         color: getRandomAsteroidColor()
     };
     
@@ -277,7 +283,7 @@ function addAsteroidToEditor() {
 }
 
 /**
- * Add an asteroid to the UI list
+ * Add an asteroid to the UI list with improved slider value handling
  * @param {Object} asteroid - The asteroid configuration object
  * @param {number} index - The index of the asteroid in the array
  */
@@ -327,18 +333,23 @@ function addAsteroidToList(asteroid, index) {
         updateOrbitPreview();
     }, 60, 350, 5);
     
-    // Create angle slider
+    // Create angle slider - ensuring exact match between slider and displayed value
+    // Convert radians to degrees for display
     const angleDegrees = Math.round((asteroid.startAngle * 180) / Math.PI);
+    
     createInputGroup(asteroidItem, 'range', `asteroid${index}StartAngle`, 'Start Angle:', angleDegrees, (value) => {
         editingLevel.asteroids[index].startAngle = (parseInt(value) * Math.PI) / 180;
         document.getElementById(`asteroid${index}StartAngle-value`).textContent = value + '°';
         updateOrbitPreview();
     }, 0, 360, 15);
     
-    // Create orbit speed slider
-    createInputGroup(asteroidItem, 'range', `asteroid${index}OrbitSpeed`, 'Orbit Speed:', asteroid.orbitSpeed, (value) => {
+    // Create orbit speed slider - ensuring proper display of decimal values
+    // Round to one decimal place for consistent display
+    const roundedSpeed = parseFloat(asteroid.orbitSpeed.toFixed(1));
+    
+    createInputGroup(asteroidItem, 'range', `asteroid${index}OrbitSpeed`, 'Orbit Speed:', roundedSpeed, (value) => {
         editingLevel.asteroids[index].orbitSpeed = parseFloat(value);
-        document.getElementById(`asteroid${index}OrbitSpeed-value`).textContent = value;
+        document.getElementById(`asteroid${index}OrbitSpeed-value`).textContent = parseFloat(value).toFixed(1);
         updateOrbitPreview();
     }, -1.5, 1.5, 0.1);
     
@@ -522,6 +533,9 @@ function resetEditorToDefault() {
 /**
  * Helper function to create input groups for the editor
  */
+/**
+ * Helper function to create input groups for the editor with improved slider handling
+ */
 function createInputGroup(parent, type, id, label, defaultValue, onChangeHandler, min, max, step) {
     const group = document.createElement('div');
     group.className = 'input-group';
@@ -537,30 +551,58 @@ function createInputGroup(parent, type, id, label, defaultValue, onChangeHandler
     const input = document.createElement('input');
     input.type = type;
     input.id = id;
-    input.value = defaultValue;
     
+    // Make sure slider uses the exact value, not a string representation
     if (type === 'range') {
         input.min = min;
         input.max = max;
         input.step = step;
         
+        // Ensure value is a number and within range - crucial for correct slider position
+        let numericValue = Number(defaultValue);
+        if (isNaN(numericValue)) {
+            numericValue = (min + max) / 2; // Default to middle if invalid
+        } else {
+            // Ensure value is within range and step constraints
+            numericValue = Math.max(min, Math.min(max, numericValue));
+            // Round to nearest step value if needed
+            if (step && step !== 1) {
+                numericValue = Math.round(numericValue / step) * step;
+            }
+        }
+        input.value = numericValue;
+        
         const valueDisplay = document.createElement('span');
         valueDisplay.id = `${id}-value`;
         valueDisplay.className = 'range-value';
-        valueDisplay.textContent = type === 'range' && id.includes('StartAngle') 
-            ? defaultValue + '°' 
-            : defaultValue;
+        
+        // Format the display value based on the input type
+        if (id.includes('StartAngle')) {
+            valueDisplay.textContent = numericValue + '°';
+        } else if (id.includes('OrbitSpeed')) {
+            valueDisplay.textContent = parseFloat(numericValue).toFixed(1);
+        } else {
+            valueDisplay.textContent = numericValue;
+        }
         
         input.addEventListener('input', () => {
-            onChangeHandler(input.value);
-            valueDisplay.textContent = type === 'range' && id.includes('StartAngle') 
-                ? input.value + '°' 
-                : input.value;
+            const value = type === 'range' ? parseFloat(input.value) : input.value;
+            onChangeHandler(value);
+            
+            // Update display with proper formatting
+            if (id.includes('StartAngle')) {
+                valueDisplay.textContent = input.value + '°';
+            } else if (id.includes('OrbitSpeed')) {
+                valueDisplay.textContent = parseFloat(input.value).toFixed(1);
+            } else {
+                valueDisplay.textContent = input.value;
+            }
         });
         
         inputContainer.appendChild(input);
         inputContainer.appendChild(valueDisplay);
     } else {
+        input.value = defaultValue;
         input.addEventListener('input', () => {
             onChangeHandler(input.value);
         });
@@ -569,6 +611,8 @@ function createInputGroup(parent, type, id, label, defaultValue, onChangeHandler
     
     group.appendChild(inputContainer);
     parent.appendChild(group);
+    
+    return input; // Return the input element for potential further manipulation
 }
 
 /**
